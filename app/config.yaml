@@ -1,0 +1,23 @@
+# DB Section
+database:
+    db: mongo_db
+    db_host: localhost
+    db_port: 27017
+    db_name: test
+    db_user: root
+    db_pass:
+
+# Directories Section
+dir:
+    router: etc/router
+    asset: public/asset
+    view: public/view
+    upload: public/upload
+    module: Module
+
+# Modules config
+modules: 
+    anu:
+        enable: true
+    tas:
+        enable: true

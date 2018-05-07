@@ -4,6 +4,7 @@ namespace App\Core;
 use Base;
 use \Symfony\Component\Yaml\Parser;
 use App\Core\Router;
+use App\Core\F3\BaseModel;
 
 /**
  * Init Framework
@@ -28,36 +29,53 @@ class Init
         $this->app = Base::instance();
         $this->parseConfig($config);
         $this->parseRouter();
+        $this->initAssets();
+    }
+
+    private function initAssets()
+    {
+        $app = $this->app;
+        $this->app->route(
+            'GET /assets/@type',
+            function ($app, $args) {
+                $path = $this->app->get('config.dir.assets') . $args['type'] . '/';
+                $files = preg_replace('/(\.+\/)/', '', $_GET['files']); // close potential hacking attempts  
+                echo \Web::instance()->minify($files, null, true, $path);
+            }
+        );
+
     }
     
     private function parseConfig(array $config)
     {
         foreach ($config as $key => $value) {
-            $this->app->set($key, $value);
+            $this->config[$key] = $value;
         }
-    }
-    
-    private function getActiveModule()
-    {
-        $modules = $this->app->get('modules');
-        $active = array();
-        foreach ($modules as $name => $option) {
-            if ($option['enable']) {
-                $active[] = $name;
-            }
+
+        if (isset($this->config['debug'])) {
+            $this->app->set('DEBUG', $this->config['debug']);
         }
-        return $active;
+
+        unset($this->config['debug']);
+
+        $this->app->set('config', $this->config);
     }
     
     private function parseRouter()
     {
-        $activeModules = $this->getActiveModule();
-        $router = $this->parser->parseFile(dirname(__DIR__).'/'.$this->app->get('dir.router').'.yaml');
-        $routes = array();
-        foreach ($router as $module => $route) {
-            if (in_array($module, $activeModules)) {
-                foreach ($route as $name => $opt) {
-                    $this->app->route("{$opt['method']} @{$module}_{$name}: {$opt['url'] }", "{$opt['target']}");
+        $modules = $this->config['modules'];
+        // var_dump($this->config['dir']['module']);die();
+        foreach ($modules as $module => $option) {
+            if ($option['enabled']) {
+                $route = dirname(__DIR__).'/'.$this->config['dir']['module'].'/'.ucfirst($module).'/router.yaml';
+                if (file_exists($route)) {
+                    $routes = $this->parser->parseFile($route);
+                    foreach ($routes as $name => $opt) {
+                        if (isset($opt['middleware'])) {
+                            $this->app->set('middleware', array("{$module}.{$name}" => $opt['middleware']));
+                        }
+                        $this->app->route("{$opt['method']} @{$module}.{$name}: {$opt['url']}", ucfirst($this->config['dir']['module']) . '\\' . ucfirst($module) . '\\' . $opt['target']);
+                    }
                 }
             }
         }
@@ -65,7 +83,7 @@ class Init
 
     public function run()
     {
-        // echo "<pre>",var_dump($this->app->get('ROUTES')),"</pre>";die();
+        \Middleware::instance()->run();
         $this->app->run();
     }
 }

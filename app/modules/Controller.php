@@ -1,9 +1,18 @@
 <?php
 namespace Modules;
 
-use App\Core\F3\F3;
+use App\Core\Template\View;
 
 class Controller
 {
-    use F3;
+    use View;
+
+    public function beforeRoute()
+    {
+        $middleware = $this->base()->get('middleware');
+        $alias = $this->base()->get('ALIAS');
+        if ($middleware[$alias]) {
+            $this->base()->call("{$middleware[$alias]}->handle");
+        }
+    }
 }

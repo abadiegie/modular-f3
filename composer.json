@@ -1,7 +1,9 @@
 {
   "require": {
     "bcosca/fatfree": "^3.6",
-    "symfony/yaml": "^4.0"
+    "symfony/yaml": "^4.0",
+    "twig/twig": "^2.4",
+    "ikkez/f3-middleware": "^1.1"
   },
   "autoload": {
     "psr-4": { 

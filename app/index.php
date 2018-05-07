@@ -7,9 +7,9 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 /**
  *
- * This file will load config file and run
+ * put config file
  *
  */
-$config = __DIR__.'/config.yaml';
+$config = __DIR__.'/etc/config.yaml';
 $init = new App\Core\Init($config);
 $init->run();

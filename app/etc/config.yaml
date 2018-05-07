@@ -1,0 +1,24 @@
+# App Section
+debug: 3
+app:
+  title: F3 Modular extended
+database:
+    db: mysql
+    db_host: localhost
+    db_port: 3306
+    db_name: test
+    db_user: root
+    db_pass: adalah
+
+# Directories Section
+dir:
+    assets: public/assets/
+    ui: view
+    upload: public/upload
+    module: modules
+    tmp: tmp
+
+# Modules config
+modules:
+  main:
+    enabled: true

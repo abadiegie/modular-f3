@@ -1,0 +1,10 @@
+default: #route name
+  url: / # url pattern
+  method: GET # method (GET, GET|POST, etc)
+  target: Controller\MainController->index # target Class->method
+  middleware: App\Libraries\Middleware\Auth
+
+home: #route name
+  url: /home # url pattern
+  method: GET # method (GET, GET|POST, etc)
+  target: Controller\MainController->home # target Class->method
